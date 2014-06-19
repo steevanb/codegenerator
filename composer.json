@@ -1,0 +1,17 @@
+{
+    "name": "steevanb/codegenerator",
+    "license": "MIT",
+    "type": "bundle",
+    "description": "Tools to generate code",
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-0": { "steevanb\\CodeGenerator\\": "" }
+    },
+    "target-dir": "steevanb/CodeGenerator",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/steevanb/codegenerator.git"
+        }
+    ]
+}
