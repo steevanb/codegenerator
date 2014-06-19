@@ -74,7 +74,7 @@ abstract class Generator
      * @param int $endOfLines Number of times to repeat end of line character
      * @return type
      */
-    public function getLine4Code($line, $tabs = null, $endOfLines = 1)
+    public function getCode4Line($line, $tabs = null, $endOfLines = 1)
     {
         return $this->_getTabs($tabs) . $line . $this->_getEndOfLines($endOfLines);
     }

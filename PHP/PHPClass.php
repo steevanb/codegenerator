@@ -2,17 +2,21 @@
 
 namespace steevanb\GeneratorBundle\Service;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
-use \steevanb\GeneratorBundle\Exception\MethodNotStarted;
+use steevanb\CodeGenerator\Core\Generator;
+use steevanb\CodeGenerator\PHP\Generator as PHPGenerator;
 
 /**
- * PHP generator
+ * PHP class generator
  */
-class PHPClass extends ContainerAware
+class PHPClass extends Generator
 {
+
+    use PHPGenerator;
+
     const VISIBILITY_PUBLIC = 1;
     const VISIBILITY_PROTECTED = 2;
     const VISIBILITY_PRIVATE = 3;
+
     protected $className;
     protected $namespace;
     protected $extends;
@@ -23,16 +27,6 @@ class PHPClass extends ContainerAware
     protected $methods = array();
     protected $extractUses = true;
     protected $uses = array();
-
-    protected function _extractUses($className)
-    {
-        if (is_array($className) === false) {
-            $className = array($className);
-        }
-        foreach ($className as $name) {
-            $this->addUse($name);
-        }
-    }
 
     public function setExtractUses($extractUses)
     {
@@ -58,10 +52,18 @@ class PHPClass extends ContainerAware
 
     public function addUse($use)
     {
-        if (in_array($use, $this->uses) === false && strpos($use, '\\') !== false) {
-            $this->uses[] = $use;
+        // className already added
+        if (array_key_exists($use, $this->uses)) {
+            return $this->uses[$use];
         }
-        return $this;
+
+        // new className
+        $class = basename($use);
+        if (in_array($class, $this->uses)) {
+            $class = uniqd($class);
+        }
+        $this->uses[$use] = $class;
+        return $class;
     }
 
     public function setUses(array $uses)
@@ -227,27 +229,31 @@ class PHPClass extends ContainerAware
 
     public function write($fileName)
     {
-        $php = $this->container->get('generator.php');
-        $php = new PHP();
+        $content = $this->getCode4Line('<?php', 0, 2);
 
         // namespace
         if ($this->getNamespace() != null) {
-            $php->addEmptyLine();
-            $php->addLine('namespace ' . $this->getNamespace(), null, 2);
+            $content .= $this->getCode4Namespace($this->getNamespace(), 0, 2);
         }
 
         // uses
         if ($this->getExtractUses()) {
-            $this->_extractUses($this->getExtends());
-            $this->_extractUses($this->getInterfaces());
-            $this->_extractUses($this->getTraits());
+            $this->setExtends($this->addUse($this->getExtends()));
+            foreach ($this->interfaces as &$interface) {
+                $interface = $this->addUse($interface);
+            }
+            foreach ($this->traits as &$trait) {
+                $trait = $this->addUse($trait);
+            }
         }
+        $content .= $this->getCode4Uses($this->getUses(), 0, 2);
 
-        $php->addLine($line)
-    }
+        // class declaration
+        $content .= $this->getStartCode4Class($this->getClassName(), $this->getExtends(), $this->getInterfaces(), $this->getTraits());
 
-    public function writeInBundle($bundle, $fileName)
-    {
-        return $this->write($fileName);
+        // properties
+        // methods
+
+        $content .= $this->getEndCode4Class();
     }
 }
