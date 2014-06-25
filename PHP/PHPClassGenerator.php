@@ -1,6 +1,6 @@
 <?php
 
-namespace steevanb\GeneratorBundle\Service;
+namespace steevanb\CodeGenerator\PHP;
 
 use steevanb\CodeGenerator\Core\Generator;
 use steevanb\CodeGenerator\PHP\Generator as PHPGenerator;
@@ -8,7 +8,7 @@ use steevanb\CodeGenerator\PHP\Generator as PHPGenerator;
 /**
  * PHP class generator
  */
-class PHPClass extends Generator
+class PHPClassGenerator extends Generator
 {
 
     use PHPGenerator;
@@ -83,7 +83,7 @@ class PHPClass extends Generator
 
     public function setClassName($name)
     {
-        $this->className;
+        $this->className = $name;
         return $this;
     }
 
@@ -108,9 +108,9 @@ class PHPClass extends Generator
         $this->interfaces = $interfaces;
     }
 
-    public function addInterface(array $interface)
+    public function addInterface($interface)
     {
-        if (in_array($this->interfaces) == false) {
+        if (in_array($interface, $this->interfaces) == false) {
             $this->interfaces[] = $interface;
         }
         return $this;
@@ -255,5 +255,7 @@ class PHPClass extends Generator
         // methods
 
         $content .= $this->getEndCode4Class();
+
+        file_put_contents($fileName, $content);
     }
 }

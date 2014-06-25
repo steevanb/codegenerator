@@ -76,6 +76,6 @@ abstract class Generator
      */
     public function getCode4Line($line, $tabs = null, $endOfLines = 1)
     {
-        return $this->_getTabs($tabs) . $line . $this->_getEndOfLines($endOfLines);
+        return $this->getTabs($tabs) . $line . $this->getEndOfLines($endOfLines);
     }
 }

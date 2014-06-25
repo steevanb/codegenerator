@@ -5,7 +5,7 @@ namespace steevanb\CodeGenerator\PHP;
 /**
  * PHP generator
  */
-class Generator
+trait Generator
 {
 
     /**
@@ -207,7 +207,7 @@ class Generator
 
         // extends
         if ($extends != null) {
-            $return . ' extends ' . $extends;
+            $return .= ' extends ' . $extends;
         }
 
         // interfaces
@@ -223,6 +223,8 @@ class Generator
         if (count($traits) > 0) {
             $return .= $this->getCode4Traits($traits, 1, 2);
         }
+
+        return $return;
     }
 
     public function getEndCode4Class()
