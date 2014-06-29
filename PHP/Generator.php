@@ -7,7 +7,6 @@ namespace steevanb\CodeGenerator\PHP;
  */
 trait Generator
 {
-
     /**
      * Indicate if we need to close PHP tag
      *
@@ -54,7 +53,7 @@ trait Generator
     /**
      * Define if uses will be concatened (use Foo, Bar;) or if we will have one line per uses (use Foo; use Bar;)
      *
-     * @param $boolean $concat
+     * @param boolean $concat
      * @return $this
      */
     public function setConcatUses($concat)
@@ -76,7 +75,7 @@ trait Generator
     /**
      * Define if traits will be concatened (use Foo, Bar;) or if we will have one line per uses (use Foo; use Bar;)
      *
-     * @param $boolean $concat
+     * @param boolean $concat
      * @return $this
      */
     public function setConcatTraits($concat)
