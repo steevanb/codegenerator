@@ -8,15 +8,10 @@ use steevanb\CodeGenerator\PHP\Generator as PHPGenerator;
 /**
  * PHP class generator
  */
-class PHPClassGenerator extends Generator
+class ClassGenerator extends Generator
 {
 
     use PHPGenerator;
-
-    const VISIBILITY_PUBLIC = 1;
-    const VISIBILITY_PROTECTED = 2;
-    const VISIBILITY_PRIVATE = 3;
-
     protected $className;
     protected $namespace;
     protected $extends;
@@ -134,7 +129,7 @@ class PHPClassGenerator extends Generator
 
     public function addTrait($trait)
     {
-        if (in_array($this->traits) == false) {
+        if (in_array($trait, $this->traits) == false) {
             $this->traits[] = $trait;
         }
         return $this;
@@ -172,7 +167,7 @@ class PHPClassGenerator extends Generator
         return $this->properties;
     }
 
-    public function startMethod($name, $visibility = self::VISIBILITY_PUBLIC, $static = false)
+    public function startMethod($name, $visibility = self::VISIBILITY_PUBLIC, $static = false, array $comments = array())
     {
         $this->methods[$name] = array(
             'visibility' => $visibility,
@@ -180,17 +175,20 @@ class PHPClassGenerator extends Generator
             'content' => array(),
             'parameters' => array(),
             'return' => null,
-            'throws' => array()
+            'throws' => array(),
+            'comments' => $comments
         );
-        $this->currentMethod = &$this->properties[$name];
+        $this->currentMethod = &$this->methods[$name];
         return $this;
     }
 
-    public function addMethodParameter($name, $type, $comment = null)
+    public function addMethodParameter($name, $type, $defaultValue = null, $forceType = false, $comment = null)
     {
         $this->currentMethod['parameters'][$name] = array(
             'type' => $type,
-            'comment' => $comment
+            'comment' => $comment,
+            'defaultValue' => $defaultValue,
+            'forceType' => $forceType
         );
         return $this;
     }
@@ -201,13 +199,13 @@ class PHPClassGenerator extends Generator
         return $this;
     }
 
-    public function addMethodLine($line, $endLine = 1)
+    public function addMethodLine($line, $endOfLines = 1)
     {
         if (is_array($this->currentMethod) === false) {
             throw new MethodNotStarted('Method not started, call startMethod() first, and finish it with finishMethod().');
         }
         $this->currentMethod['content'][] = $line;
-        for ($x = 0; $x < $endLine - 1; $x++) {
+        for ($x = 0; $x < $endOfLines - 1; $x++) {
             $this->currentMethod['content'][] = null;
         }
         return $this;
@@ -225,6 +223,11 @@ class PHPClassGenerator extends Generator
     {
         $this->currentMethodContent = null;
         return $this;
+    }
+
+    public function getMethods()
+    {
+        return $this->methods;
     }
 
     public function write($fileName)
@@ -253,6 +256,20 @@ class PHPClassGenerator extends Generator
 
         // properties
         // methods
+        $countMethods = count($this->getMethods());
+        $index = 0;
+        foreach ($this->getMethods() as $name => $infos) {
+            $content .= $this->getStartCode4Method($name, $infos['parameters'], $infos['return'], $infos['visibility'], $infos['static'], $infos['throws'], $infos['comments']);
+            foreach ($infos['content'] as $line) {
+                $content .= $this->getCode4Line($line, 2, 1);
+            }
+            $content .= $this->getEndCode4Method();
+            if ($index < $countMethods - 1) {
+                $content .= $this->getEndOfLines();
+            }
+            $index++;
+        }
+
 
         $content .= $this->getEndCode4Class();
 

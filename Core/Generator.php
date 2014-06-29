@@ -7,13 +7,15 @@ namespace steevanb\CodeGenerator\Core;
  */
 abstract class Generator
 {
-
+    const VISIBILITY_PUBLIC = 1;
+    const VISIBILITY_PROTECTED = 2;
+    const VISIBILITY_PRIVATE = 3;
     /**
      * Tabulation character
      *
      * @var string
      */
-    protected $tabStr = true;
+    protected $tabStr = '    ';
 
     /**
      * Write content in $fileName
@@ -74,7 +76,7 @@ abstract class Generator
      * @param int $endOfLines Number of times to repeat end of line character
      * @return type
      */
-    public function getCode4Line($line, $tabs = null, $endOfLines = 1)
+    public function getCode4Line($line, $tabs = 0, $endOfLines = 1)
     {
         return $this->getTabs($tabs) . $line . $this->getEndOfLines($endOfLines);
     }

@@ -130,11 +130,12 @@ trait Generator
         if (is_array($comments) == false) {
             $comments = array($comments);
         }
-        $return = '/**' . $this->getEndOfLines();
+        $return = $this->getCode4Line('/**', $tabs, 1);
         foreach ($comments as $comment) {
-            $return .= $this->getLine4Code(' * ' . $comment, $tabs, 1);
+            $return .= $this->getCode4Line(' * ' . $comment, $tabs, 1);
         }
-        $this->addLine(' */', $tabs, $endOfLines);
+        $return .= $this->getCode4Line(' */', $tabs, $endOfLines);
+        return $return;
     }
 
     /**
@@ -147,7 +148,7 @@ trait Generator
      */
     public function getCode4Namespace($namespace, $tabs = 0, $endOfLines = 1)
     {
-        return $this->getCode4Line('namespace ' . $namespace, $tabs, $endOfLines);
+        return $this->getCode4Line('namespace ' . $namespace . ';', $tabs, $endOfLines);
     }
 
     /**
@@ -181,15 +182,16 @@ trait Generator
         return $return;
     }
 
-    public function getCode4Traits(array $traits, $tabs = 0, $endOfLines = 2)
+    public function getCode4Traits(array $traits, $tabs = 1, $endOfLines = 2)
     {
         $return = null;
+
         if ($this->getConcatTraits()) {
             $tabsStr = $this->getTabs($tabs);
             $return .= $tabsStr . 'use ' . implode(',' . $this->getEndOfLines() . $tabsStr . '    ', $traits) . ';' . $this->getEndOfLines();
         } else {
             foreach ($traits as $trait) {
-                $return .= $this->getCode4Line('use ' . $trait . ';', $tabs, 1);
+                $return .= $this->getCode4Line('use ' . $trait . ';', $tabs);
             }
         }
         if (count($traits) > 0 && $endOfLines > 1) {
@@ -199,35 +201,120 @@ trait Generator
         return $return;
     }
 
-    public function getStartCode4Class($className, $extends = null, array $interfaces = array(), array $traits = array())
+    public function getStartCode4Class($className, $extends = null, array $interfaces = array(), array $traits = array(), $tabs = 0, $endOfLines = 1)
     {
         // className
-        $return = 'class ' . $className;
+        $declaration = 'class ' . $className;
 
         // extends
         if ($extends != null) {
-            $return .= ' extends ' . $extends;
+            $declaration .= ' extends ' . $extends;
         }
 
         // interfaces
         if (count($interfaces) > 0) {
-            $return .= ' implements ' . implode(', ', $interfaces);
+            $declaration .= ' implements ' . implode(', ', $interfaces);
         }
 
         // end of declaration
-        $return .= $this->getEndOfLines();
-        $return .= $this->getCode4Line('{', 0, 1);
+        $return = $this->getCode4Line($declaration, $tabs, 1);
+        $return .= $this->getCode4Line('{', $tabs, 1);
 
         // traits
         if (count($traits) > 0) {
-            $return .= $this->getCode4Traits($traits, 1, 2);
+            $return .= $this->getCode4Traits($traits, $tabs + 1, 2);
         }
+
+        $return .= $this->getEndOfLines($endOfLines - 1);
 
         return $return;
     }
 
-    public function getEndCode4Class()
+    public function getEndCode4Class($tabs = 0, $endOfLines = 0)
     {
-        return $this->getCode4Line('}', 0, 0);
+        return $this->getCode4Line('}', $tabs, $endOfLines);
+    }
+
+    public function getStartCode4Method($name, array $parameters = array(), $return = null, $visibility = self::VISIBILITY_PUBLIC, $static = false, array $throws = array(), array $comments = array(), $tabs = 1, $endOfLines = 1)
+    {
+        $returnStr = null;
+        // if a phpdoc is required
+        if (count($parameters) > 0 || $return !== null || count($throws) > 0 || count($comments) > 0) {
+            $phpDoc = array();
+
+            // comments
+            if (count($comments) > 0) {
+                $phpDoc = array_merge($phpDoc, $comments);
+                $phpDoc[] = null;
+            }
+
+            // parameters
+            foreach ($parameters as $paramName => $infos) {
+                $paramStr = '@param ' . $infos['type'] . ' ' . $paramName;
+                if ($infos['comment'] != null) {
+                    $paramStr .= ' ' . $infos['comment'];
+                }
+                $phpDoc[] = $paramStr;
+            }
+
+            // exceptions
+            foreach ($throws as $throw) {
+                $phpDoc[] = '@throws ' . $throw;
+            }
+
+            // return
+            if ($return !== null) {
+                $phpDoc[] = '@return ' . $return;
+            }
+
+            $returnStr .= $this->getCode4PHPDocComments($phpDoc, $tabs, 1);
+        }
+
+        $declaration = null;
+
+        // visibility
+        switch ($visibility) {
+            case self::VISIBILITY_PUBLIC:
+                $declaration .= 'public ';
+                break;
+            case self::VISIBILITY_PROTECTED:
+                $declaration .= 'protected ';
+                break;
+            case self::VISIBILITY_PRIVATE:
+                $declaration .= 'private ';
+                break;
+        }
+
+        // static
+        if ($static) {
+            $declaration .= 'static ';
+        }
+
+        $declaration .= 'function ' . $name . '(';
+        // parameters
+        $paramsDeclaration = array();
+        foreach ($parameters as $paramName => $infos) {
+            $paramDeclaration = null;
+            if ($infos['forceType']) {
+                $paramDeclaration .= $infos['type'] . ' ';
+            }
+            $paramDeclaration .= $paramName;
+            if ($infos['defaultValue'] !== null) {
+                $paramDeclaration .= ' = ' . $infos['defaultValue'];
+            }
+            $paramsDeclaration[] = $paramDeclaration;
+        }
+        $declaration .= implode(', ', $paramsDeclaration);
+        $declaration .= ')';
+
+        $returnStr .= $this->getCode4Line($declaration, $tabs, 1);
+        $returnStr .= $this->getCode4Line('{', $tabs, 1);
+
+        return $returnStr;
+    }
+
+    public function getEndCode4Method($tabs = 1, $endOfLines = 1)
+    {
+        return $this->getCode4Line('}', $tabs, $endOfLines);
     }
 }
