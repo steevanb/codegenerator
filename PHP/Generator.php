@@ -147,7 +147,7 @@ trait Generator
      */
     public function getCode4Namespace($namespace, $tabs = 0, $endOfLines = 1)
     {
-        return $this->getLine4Code('namespace ' . $namespace, $tabs, $endOfLines);
+        return $this->getCode4Line('namespace ' . $namespace, $tabs, $endOfLines);
     }
 
     /**
