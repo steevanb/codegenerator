@@ -467,15 +467,16 @@ class ClassGenerator extends Generator
         }
 
         // uses
-        if ($this->getExtractUses()) {
-            $this->setExtends($this->addUse($this->getExtends()));
-            foreach ($this->interfaces as &$interface) {
-                $interface = $this->addUse($interface);
-            }
-            foreach ($this->traits as &$trait) {
-                $trait = $this->addUse($trait);
-            }
-        }
+        // @TODO
+        /* if ($this->getExtractUses()) {
+          $this->setExtends($this->addUse($this->getExtends()));
+          foreach ($this->interfaces as &$interface) {
+          $interface = $this->addUse($interface);
+          }
+          foreach ($this->traits as &$trait) {
+          $trait = $this->addUse($trait);
+          }
+          } */
         $content .= $this->getCode4Uses($this->getUses(), 0, 2);
 
         // class declaration
