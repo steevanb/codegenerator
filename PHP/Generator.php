@@ -182,6 +182,14 @@ trait Generator
         return $return;
     }
 
+    /**
+     * Return code for traits
+     *
+     * @param array $traits
+     * @param int $tabs Number of tabs, null to use internal counter
+     * @param int $endOfLines Number of end line character to add
+     * @return string
+     */
     public function getCode4Traits(array $traits, $tabs = 1, $endOfLines = 2)
     {
         $return = null;
@@ -201,6 +209,17 @@ trait Generator
         return $return;
     }
 
+    /**
+     * Return start code to start a class
+     *
+     * @param string $className
+     * @param string $extends
+     * @param array $interfaces
+     * @param array $traits
+     * @param int $tabs Number of tabs, null to use internal counter
+     * @param int $endOfLines Number of end line character to add
+     * @return string
+     */
     public function getStartCode4Class($className, $extends = null, array $interfaces = array(), array $traits = array(), $tabs = 0, $endOfLines = 1)
     {
         // className
@@ -230,11 +249,61 @@ trait Generator
         return $return;
     }
 
+    /**
+     * Return code for the end of a class
+     *
+     * @param int $tabs Number of tabs, null to use internal counter
+     * @param int $endOfLines Number of end line character to add
+     * @return string
+     */
     public function getEndCode4Class($tabs = 0, $endOfLines = 0)
     {
         return $this->getCode4Line('}', $tabs, $endOfLines);
     }
 
+    /**
+     * Return code for visibility
+     *
+     * @param int $visibility Use self::VISIBLITY_XXX
+     * @return string
+     */
+    public function getCode4Visibility($visibility)
+    {
+        switch ($visibility) {
+            case self::VISIBILITY_PUBLIC:
+                return 'public ';
+            case self::VISIBILITY_PROTECTED:
+                return 'protected ';
+            case self::VISIBILITY_PRIVATE:
+                return 'private ';
+        }
+    }
+
+    /**
+     * Get code for static
+     *
+     * @param boolean $static
+     * @return string
+     */
+    public function getCode4Static($static)
+    {
+        return ($static) ? 'static ' : null;
+    }
+
+    /**
+     * Return code to start a method
+     *
+     * @param string $name
+     * @param array $parameters
+     * @param string $return
+     * @param int $visibility
+     * @param boolean $static
+     * @param array $throws
+     * @param array $comments
+     * @param int $tabs Number of tabs, null to use internal counter
+     * @param int $endOfLines Number of end line character to add
+     * @return string
+     */
     public function getStartCode4Method($name, array $parameters = array(), $return = null, $visibility = self::VISIBILITY_PUBLIC, $static = false, array $throws = array(), array $comments = array(), $tabs = 1, $endOfLines = 1)
     {
         $returnStr = null;
@@ -273,22 +342,10 @@ trait Generator
         $declaration = null;
 
         // visibility
-        switch ($visibility) {
-            case self::VISIBILITY_PUBLIC:
-                $declaration .= 'public ';
-                break;
-            case self::VISIBILITY_PROTECTED:
-                $declaration .= 'protected ';
-                break;
-            case self::VISIBILITY_PRIVATE:
-                $declaration .= 'private ';
-                break;
-        }
+        $declaration .= $this->getCode4Visibility($visibility);
 
         // static
-        if ($static) {
-            $declaration .= 'static ';
-        }
+        $declaration .= $this->getCode4Static($static);
 
         $declaration .= 'function ' . $name . '(';
         // parameters
@@ -308,13 +365,58 @@ trait Generator
         $declaration .= ')';
 
         $returnStr .= $this->getCode4Line($declaration, $tabs, 1);
-        $returnStr .= $this->getCode4Line('{', $tabs, 1);
+        $returnStr .= $this->getCode4Line('{', $tabs, 1, $endOfLines);
 
         return $returnStr;
     }
 
+    /**
+     * Return code for the end of a method
+     *
+     * @param int $tabs Number of tabs, null to use internal counter
+     * @param int $endOfLines Number of end line character to add
+     * @return string
+     */
     public function getEndCode4Method($tabs = 1, $endOfLines = 1)
     {
         return $this->getCode4Line('}', $tabs, $endOfLines);
+    }
+
+    /**
+     * Return code for a property declaration
+     *
+     * @param array $property
+     * @param int $tabs Number of tabs, null to use internal counter
+     * @param int $endOfLines Number of end line character to add
+     * @return string
+     */
+    public function getCode4Property($property, $tabs = 1, $endOfLines = 1)
+    {
+        $return = null;
+
+        // phpdoc
+        $comments = array();
+        if (count($property['comments']) > 0) {
+            $comments = array_merge($comments, $property['comments']);
+        }
+        if ($property['type'] !== null) {
+            if (count($property['comments']) > 0) {
+                $comments[] = null;
+            }
+            $comments[] = '@var ' . $property['type'];
+        }
+        $return .= $this->getCode4PHPDocComments($comments, $tabs);
+
+        // php declaration
+        $declaration = $this->getCode4Visibility($property['visibility']);
+        $declaration .= $this->getCode4Static($property['static']);
+        $declaration .= '$' . $property['name'];
+        if ($property['defaultValue'] !== null) {
+            $declaration .= ' = ' . $property['defaultValue'];
+        }
+        $declaration .= ';';
+        $return .= $this->getCode4Line($declaration, $tabs, $endOfLines);
+
+        return $return;
     }
 }
