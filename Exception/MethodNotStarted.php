@@ -1,6 +1,6 @@
 <?php
 
-namespace steevanb\CodeGenerator\PHP;
+namespace steevanb\CodeGenerator\Exception;
 
 class MethodNotStarted extends \Exception
 {
