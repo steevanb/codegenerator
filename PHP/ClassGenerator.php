@@ -549,20 +549,20 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Write PHP code to file
+	 * Return PHP generated code
 	 *
-	 * @param string $fileName
+	 * @return string
 	 */
-	public function write($fileName)
+	public function getCode()
 	{
 		$countProperties = count($this->getProperties());
 		$countMethods = count($this->getMethods());
 
-		$content = $this->getCode4Line('<?php', 0, 2);
+		$return = $this->getCode4Line('<?php', 0, 2);
 
 		// namespace
 		if ($this->getNamespace() != null) {
-			$content .= $this->getCode4Namespace($this->getNamespace(), 0, 2);
+			$return .= $this->getCode4Namespace($this->getNamespace(), 0, 2);
 		}
 
 		// extract uses
@@ -611,45 +611,56 @@ class ClassGenerator extends Generator
 		}
 
 		// uses
-		$content .= $this->getCode4Uses($this->getUses(), $this->getConcatUses(), 0, 2);
+		$return .= $this->getCode4Uses($this->getUses(), $this->getConcatUses(), 0, 2);
 
 		// class declaration
-		$content .= $this->getStartCode4Class($this->getClassName(), $this->getExtends(), $this->getInterfaces(), $this->getTraits());
+		$return .= $this->getStartCode4Class($this->getClassName(), $this->getExtends(), $this->getInterfaces(), $this->getTraits());
 
 		// properties
 		$indexProperties = 0;
 
 		foreach ($this->getProperties() as $property) {
-			$content .= $this->getCode4Property($property);
+			$return .= $this->getCode4Property($property);
 
 			if ($indexProperties < $countProperties - 1) {
-				$content .= $this->getEndOfLines();
+				$return .= $this->getEndOfLines();
 			}
 
 			$indexProperties++;
 		}
 		if ($countProperties > 0 && $countMethods > 0) {
-			$content .= $this->getEndOfLines();
+			$return .= $this->getEndOfLines();
 		}
 
 		// methods
 		$indexMethods = 0;
 		foreach ($this->getMethods() as $name => $infos) {
-			$content .= $this->getStartCode4Method($name, $infos['parameters'], $infos['return'], $infos['visibility'], $infos['static'], $infos['throws'], $infos['comments']);
+			$return .= $this->getStartCode4Method($name, $infos['parameters'], $infos['return'], $infos['visibility'], $infos['static'], $infos['throws'], $infos['comments']);
 			foreach ($infos['content'] as $line) {
-				$content .= $this->getCode4Line($line, 2, 1);
+				$return .= $this->getCode4Line($line, 2, 1);
 			}
-			$content .= $this->getEndCode4Method();
+			$return .= $this->getEndCode4Method();
 			if ($indexMethods < $countMethods - 1) {
-				$content .= $this->getEndOfLines();
+				$return .= $this->getEndOfLines();
 			}
 			$indexMethods++;
 		}
 
-		$content .= $this->getEndCode4Class();
+		$return .= $this->getEndCode4Class();
 
+		return $return;
+	}
+
+	/**
+	 * Write PHP code to file
+	 *
+	 * @param string $fileName
+	 */
+	public function write($fileName)
+	{
+		$code = $this->getCode();
 		$this->_createDir(dirname($fileName));
-		file_put_contents($fileName, $content);
+		file_put_contents($fileName, $code);
 	}
 
 }
