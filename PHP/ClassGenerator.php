@@ -3,7 +3,6 @@
 namespace steevanb\CodeGenerator\PHP;
 
 use steevanb\CodeGenerator\Core\Generator;
-use steevanb\CodeGenerator\PHP\Generator as PHPGenerator;
 use steevanb\CodeGenerator\Exception\MethodNotStarted;
 use steevanb\CodeGenerator\Exception\ClassNameExists;
 
@@ -13,7 +12,7 @@ use steevanb\CodeGenerator\Exception\ClassNameExists;
 class ClassGenerator extends Generator
 {
 
-	use PHPGenerator;
+	use Code;
 	/**
 	 * @var string
 	 */
@@ -65,6 +64,93 @@ class ClassGenerator extends Generator
 	 * @var array
 	 */
 	protected $uses = array();
+
+	/**
+	 * Indicate if we need to close PHP tag
+	 *
+	 * @var type
+	 */
+	protected $endPHPTag = false;
+
+	/**
+	 * Indicate if uses will be concatened (use Foo, Bar;) or if we will have one line per uses (use Foo; use Bar;)
+	 *
+	 * @var boolean
+	 */
+	protected $concatUses = false;
+
+	/**
+	 * Indicate if traits will be concatened (use Foo, Bar;) or if we will have one line per uses (use Foo; use Bar;)
+	 *
+	 * @var boolean
+	 */
+	protected $concatTraits = false;
+
+	/**
+	 * Define if we need to close PHP tag
+	 *
+	 * @param boolean $endPHPTag
+	 * @return $this
+	 */
+	public function setEndPHPTag($endPHPTag)
+	{
+		$this->endPHPTag = $endPHPTag;
+		return $this;
+	}
+
+	/**
+	 * Indicate if we need to close PHP tag
+	 *
+	 * @return boolean
+	 */
+	public function getEndPHPTag()
+	{
+		return $this->endPHPTag;
+	}
+
+	/**
+	 * Define if uses will be concatened (use Foo, Bar;) or if we will have one line per uses (use Foo; use Bar;)
+	 *
+	 * @param boolean $concat
+	 * @return $this
+	 */
+	public function setConcatUses($concat)
+	{
+		$this->concatUses = $concat;
+		return $this;
+	}
+
+	/**
+	 * Indicate if uses will be concatened (use Foo, Bar;) or if we will have one line per uses (use Foo; use Bar;)
+	 *
+	 * @return boolean
+	 */
+	public function getConcatUses()
+	{
+		return $this->concatUses;
+	}
+
+	/**
+	 * Define if traits will be concatened (use Foo, Bar;) or if we will have one line per uses (use Foo; use Bar;)
+	 *
+	 * @param boolean $concat
+	 * @return $this
+	 */
+	public function setConcatTraits($concat)
+	{
+		$this->concatTraits = $concat;
+		return $this;
+	}
+
+	/**
+	 * Indicate if traits will be concatened (use Foo, Bar;) or if we will have one line per uses (use Foo; use Bar;)
+	 *
+	 * @return boolean
+	 */
+	public function getConcatTraits()
+	{
+		return $this->concatTraits;
+	}
 
 	/**
 	 * Define if we need to extract all classes and add it as use
@@ -525,7 +611,7 @@ class ClassGenerator extends Generator
 		}
 
 		// uses
-		$content .= $this->getCode4Uses($this->getUses(), 0, 2);
+		$content .= $this->getCode4Uses($this->getUses(), $this->getConcatUses(), 0, 2);
 
 		// class declaration
 		$content .= $this->getStartCode4Class($this->getClassName(), $this->getExtends(), $this->getInterfaces(), $this->getTraits());

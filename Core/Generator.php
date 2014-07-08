@@ -18,13 +18,6 @@ abstract class Generator
 	protected $tabStr = '    ';
 
 	/**
-	 * Write content in $fileName
-	 *
-	 * @param string $fileName
-	 */
-	abstract public function write($fileName);
-
-	/**
 	 * Create directory
 	 *
 	 * @param string $dir
