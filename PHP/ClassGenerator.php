@@ -286,6 +286,21 @@ class ClassGenerator extends Generator
 	}
 
 	/**
+	 * Return fully qualified class name
+	 *
+	 * @return string
+	 */
+	public function getFullyQualifiedClassName()
+	{
+		$return = null;
+		if ($this->getNamespace() != null) {
+			$return .= $this->getNamespace() . '\\';
+		}
+		$return .= $this->getClassName();
+		return $return;
+	}
+
+	/**
 	 * Define extended class
 	 *
 	 * @param string $extends
@@ -574,28 +589,28 @@ class ClassGenerator extends Generator
 			}
 
 			// interfaces
-			foreach ($this->interfaces as &$interface) {
+			foreach ($this->interfaces as $interface) {
 				if (strpos($interface, '\\') !== false) {
 					$interface = $this->addUse($interface);
 				}
 			}
 
 			// traits
-			foreach ($this->traits as &$trait) {
+			foreach ($this->traits as $trait) {
 				if (strpos($trait, '\\') !== false) {
 					$trait = $this->addUse($trait);
 				}
 			}
 
 			// properties
-			foreach ($this->properties as &$property) {
+			foreach ($this->properties as $property) {
 				if (strpos($property['type'], '\\') !== false) {
 					$property['type'] = $this->addUse($property['type']);
 				}
 			}
 
 			// methods
-			foreach ($this->methods as &$method) {
+			foreach ($this->methods as $method) {
 				// parameters
 				foreach ($method['parameters'] as &$parameter) {
 					if (strpos($parameter['type'], '\\') !== false) {
@@ -610,6 +625,7 @@ class ClassGenerator extends Generator
 			}
 		}
 
+
 		// uses
 		$return .= $this->getCode4Uses($this->getUses(), $this->getConcatUses(), 0, 2);
 
@@ -618,10 +634,8 @@ class ClassGenerator extends Generator
 
 		// properties
 		$indexProperties = 0;
-
 		foreach ($this->getProperties() as $property) {
 			$return .= $this->getCode4Property($property);
-
 			if ($indexProperties < $countProperties - 1) {
 				$return .= $this->getEndOfLines();
 			}
