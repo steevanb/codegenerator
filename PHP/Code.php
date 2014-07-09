@@ -334,12 +334,14 @@ trait Code
 			}
 			$comments[] = '@var ' . $property['type'];
 		}
-		$return .= $this->getCode4PHPDocComments($comments, $tabs);
+		if (count($comments) > 0) {
+			$return .= $this->getCode4PHPDocComments($comments, $tabs);
+		}
 
 		// php declaration
 		$declaration = $this->getCode4Visibility($property['visibility']);
 		$declaration .= $this->getCode4Static($property['static']);
-		$declaration .= '$' . $property['name'];
+		$declaration .= (substr($property['name'], 0, 1) == '$') ? $property['name'] : '$' . $property['name'];
 		if ($property['defaultValue'] !== null) {
 			$declaration .= ' = ' . $property['defaultValue'];
 		}
