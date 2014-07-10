@@ -39,7 +39,7 @@ class ClassGenerator extends Generator
 	protected $traits = array();
 
 	/**
-	 * @var array
+	 * @var ClassProperty[]
 	 */
 	protected $properties = array();
 
@@ -419,24 +419,12 @@ class ClassGenerator extends Generator
 	/**
 	 * Add a property
 	 *
-	 * @param string $name
-	 * @param string $type
-	 * @param string  $defaultValue
-	 * @param int $visibility Use ClassGenerator::VISIBILITY_XXX
-	 * @param boolean $static
-	 * @param array $comments
+	 * @param ClassProperty $property
 	 * @return $this
 	 */
-	public function addProperty($name, $type = null, $defaultValue = null, $visibility = self::VISIBILITY_PRIVATE, $static = false, array $comments = array())
+	public function addProperty(ClassProperty $property)
 	{
-		$this->properties[$name] = array(
-			'name' => $name,
-			'type' => $type,
-			'defaultValue' => $defaultValue,
-			'visibility' => $visibility,
-			'static' => $static,
-			'comments' => $comments
-		);
+		$this->properties[$property->getName()] = $property;
 		return $this;
 	}
 
@@ -603,9 +591,9 @@ class ClassGenerator extends Generator
 			}
 
 			// properties
-			foreach ($this->properties as $property) {
-				if (strpos($property['type'], '\\') !== false) {
-					$property['type'] = $this->addUse($property['type']);
+			foreach ($this->getProperties() as $property) {
+				if (strpos($property->getType(), '\\') !== false) {
+					$property->setType($this->addUse($property->getType()));
 				}
 			}
 

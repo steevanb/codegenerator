@@ -11,7 +11,7 @@ use steevanb\CodeGenerator\Model\Visibility;
 /**
  * Method parameter definition
  */
-class ClassMethodParameter
+class MethodParameter
 {
 
 	use Comments,

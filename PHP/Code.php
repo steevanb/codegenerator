@@ -53,15 +53,15 @@ trait Code
 	 */
 	public function getCode4PHPDocComments($comments, $tabs = 0, $endOfLines = 1)
 	{
-
 		if (is_array($comments) == false) {
-			$comments = array($comments);
+			$comments = array('comments' => $comments);
 		}
-		$return = $this->getCode4Line('/**', $tabs, 1);
-		foreach ($comments as $comment) {
-			$return .= $this->getCode4Line(' * ' . $comment, $tabs, 1);
+		$return = null;
+		$phpDocs = PHPDoc::generate($comments);
+		foreach ($phpDocs as $phpDoc) {
+			$return .= $this->getCode4Line($phpDoc, $tabs);
 		}
-		$return .= $this->getCode4Line(' */', $tabs, $endOfLines);
+		$return .= $this->getEndOfLines($endOfLines - 1);
 		return $return;
 	}
 
@@ -314,36 +314,28 @@ trait Code
 	/**
 	 * Return code for a property declaration
 	 *
-	 * @param array $property
+	 * @param ClassProperty $property
 	 * @param int $tabs Number of tabs, null to use internal counter
 	 * @param int $endOfLines Number of end line character to add
 	 * @return string
 	 */
-	public function getCode4Property($property, $tabs = 1, $endOfLines = 1)
+	public function getCode4Property(ClassProperty $property, $tabs = 1, $endOfLines = 1)
 	{
 		$return = null;
 
 		// phpdoc
-		$comments = array();
-		if (count($property['comments']) > 0) {
-			$comments = array_merge($comments, $property['comments']);
+		$comments = array('comments' => $property->getComments());
+		if ($property->getType() !== null) {
+			$comments['@var'] = array('type' => $property->getType());
 		}
-		if ($property['type'] !== null) {
-			if (count($property['comments']) > 0) {
-				$comments[] = null;
-			}
-			$comments[] = '@var ' . $property['type'];
-		}
-		if (count($comments) > 0) {
-			$return .= $this->getCode4PHPDocComments($comments, $tabs);
-		}
+		$return .= $this->getCode4PHPDocComments($comments, $tabs);
 
 		// php declaration
-		$declaration = $this->getCode4Visibility($property['visibility']);
-		$declaration .= $this->getCode4Static($property['static']);
-		$declaration .= (substr($property['name'], 0, 1) == '$') ? $property['name'] : '$' . $property['name'];
-		if ($property['defaultValue'] !== null) {
-			$declaration .= ' = ' . $property['defaultValue'];
+		$declaration = $this->getCode4Visibility($property->getVisibility());
+		$declaration .= $this->getCode4Static($property->isStatic());
+		$declaration .= (substr($property->getName(), 0, 1) == '$') ? $property->getName() : '$' . $property->getName();
+		if ($property->getDefaultValue() !== null) {
+			$declaration .= ' = ' . $property->getDefaultValue();
 		}
 		$declaration .= ';';
 		$return .= $this->getCode4Line($declaration, $tabs, $endOfLines);

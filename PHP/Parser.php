@@ -60,11 +60,11 @@ class Parser
 		require_once($fileName);
 		$fullyQualifiedClassName = $return->getFullyQualifiedClassName();
 		$reflection = new \ReflectionClass($fullyQualifiedClassName);
-		foreach ($reflection->getProperties() as $property) {
-			if ($property->getDeclaringClass()->getName() == $fullyQualifiedClassName) {
-
-				$return->addProperty($property->getName(), null, $property->getValue(), $visibility, $isInClass, $comments);
-				d($property);
+		foreach ($reflection->getProperties() as $reflectionProperty) {
+			$reflectionProperty->setAccessible(true);
+			if ($reflectionProperty->getDeclaringClass()->getName() == $fullyQualifiedClassName) {
+				$property = ClassProperty::getFromReflection($reflectionProperty);
+				$return->addProperty($property);
 			}
 		}
 

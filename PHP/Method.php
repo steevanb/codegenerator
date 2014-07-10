@@ -7,7 +7,7 @@ use steevanb\CodeGenerator\Model\IsStatic;
 use steevanb\CodeGenerator\Model\Name;
 use steevanb\CodeGenerator\Model\Visibility;
 
-class ClassMethod
+class Method
 {
 
 	use Comments,
