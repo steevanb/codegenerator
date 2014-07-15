@@ -112,7 +112,6 @@ class PHPDoc
 	 */
 	public static function generate(array $phpDoc)
 	{
-		$return = array();
 		$start = ' * ';
 
 		// comment
@@ -129,7 +128,8 @@ class PHPDoc
 		foreach ($phpDoc as $keyword => $doc) {
 			switch ($keyword) {
 				case '@var' :
-					$comment = $start . '@var ' . $doc['type'];
+				case '@return' :
+					$comment = $start . $keyword . ' ' . $doc['type'];
 					if (array_key_exists('comment', $doc) && $doc['comment'] != null) {
 						$comment .= ' ' . $doc['comment'];
 					}

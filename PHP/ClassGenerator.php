@@ -3,7 +3,6 @@
 namespace steevanb\CodeGenerator\PHP;
 
 use steevanb\CodeGenerator\Core\Generator;
-use steevanb\CodeGenerator\Exception\MethodNotStarted;
 use steevanb\CodeGenerator\Exception\ClassNameExists;
 
 /**
@@ -51,7 +50,7 @@ class ClassGenerator extends Generator
 	protected $currentMethod;
 
 	/**
-	 * @var array
+	 * @var Method[]
 	 */
 	protected $methods = array();
 
@@ -85,6 +84,16 @@ class ClassGenerator extends Generator
 	 * @var boolean
 	 */
 	protected $concatTraits = false;
+
+	/**
+	 * Constructor
+	 *
+	 * @param string $name
+	 */
+	public function __construct($name = null)
+	{
+		$this->setClassName($name);
+	}
 
 	/**
 	 * Define if we need to close PHP tag
@@ -450,94 +459,14 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Start a method
-	 * Use addMethodParameter, addMethodThrows, addMethodLine and finishMethod when it's over
+	 * Add a method
 	 *
-	 * @param string $name
-	 * @param int $visibility Use ClassGenerator::VISIBILITY_XXX
-	 * @param boolean $static
-	 * @param array $comments
-	 * @param string $return
+	 * @param Method $method
 	 * @return $this
 	 */
-	public function startMethod($name, $visibility = self::VISIBILITY_PUBLIC, $static = false, array $comments = array(), $return = null)
+	public function addMethod(Method $method)
 	{
-		$this->methods[$name] = array(
-			'visibility' => $visibility,
-			'static' => $static,
-			'content' => array(),
-			'parameters' => array(),
-			'throws' => array(),
-			'comments' => $comments,
-			'return' => $return
-		);
-		$this->currentMethod = &$this->methods[$name];
-		return $this;
-	}
-
-	/**
-	 * Add a parameter to the current open method
-	 *
-	 * @param string $name
-	 * @param string $type
-	 * @param string  $defaultValue
-	 * @param boolean $forceType Indicate if type will be added in method declaration, like MyType $myParam
-	 * @param string $comment
-	 * @return $this
-	 */
-	public function addMethodParameter($name, $type, $defaultValue = null, $forceType = false, $comment = null)
-	{
-		$this->currentMethod['parameters'][$name] = array(
-			'type' => $type,
-			'comment' => $comment,
-			'defaultValue' => $defaultValue,
-			'forceType' => $forceType
-		);
-		return $this;
-	}
-
-	/**
-	 * Add a line to the current open method
-	 *
-	 * @param string $line
-	 * @param int $endOfLines
-	 * @throws MethodNotStarted
-	 * @return $this
-	 */
-	public function addMethodLine($line, $endOfLines = 1)
-	{
-		if (is_array($this->currentMethod) === false) {
-			throw new MethodNotStarted('Method not started, call startMethod() first, and finish it with finishMethod().');
-		}
-		$this->currentMethod['content'][] = $line;
-		for ($x = 0; $x < $endOfLines - 1; $x++) {
-			$this->currentMethod['content'][] = null;
-		}
-		return $this;
-	}
-
-	/**
-	 * Add an exception throwned by the current open method
-	 *
-	 * @param string $throws
-	 * @return $this
-	 */
-	public function addMethodThrows($throws)
-	{
-		if (in_array($throws, $this->currentMethod['throws']) === false) {
-			$this->currentMethod['throws'][] = $throws;
-		}
-		return $this;
-	}
-
-	/**
-	 * Finish current open method
-	 *
-	 * @return $this
-	 */
-	public function finishMethod()
-	{
-		$this->currentMethodContent = false;
+		$this->methods[] = $method;
 		return $this;
 	}
 
@@ -598,17 +527,17 @@ class ClassGenerator extends Generator
 			}
 
 			// methods
-			foreach ($this->methods as $method) {
+			foreach ($this->getMethods() as $method) {
 				// parameters
-				foreach ($method['parameters'] as &$parameter) {
-					if (strpos($parameter['type'], '\\') !== false) {
-						$parameter['type'] = $this->addUse($parameter['type']);
+				foreach ($method->getParameters() as $parameter) {
+					if (strpos($parameter->getType(), '\\') !== false) {
+						$parameter->setType($this->addUse($parameter->getType()));
 					}
 				}
 
 				// return
-				if (strpos($method['return'], '\\') !== false) {
-					$method['return'] = $this->addUse($method['return']);
+				if (strpos($method->getReturn(), '\\') !== false) {
+					$method->setReturn($this->addUse($method->getReturn()));
 				}
 			}
 		}
@@ -636,12 +565,8 @@ class ClassGenerator extends Generator
 
 		// methods
 		$indexMethods = 0;
-		foreach ($this->getMethods() as $name => $infos) {
-			$return .= $this->getStartCode4Method($name, $infos['parameters'], $infos['return'], $infos['visibility'], $infos['static'], $infos['throws'], $infos['comments']);
-			foreach ($infos['content'] as $line) {
-				$return .= $this->getCode4Line($line, 2, 1);
-			}
-			$return .= $this->getEndCode4Method();
+		foreach ($this->getMethods() as $method) {
+			$return .= $this->getCode4Method($method);
 			if ($indexMethods < $countMethods - 1) {
 				$return .= $this->getEndOfLines();
 			}

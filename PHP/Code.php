@@ -220,83 +220,52 @@ trait Code
 	}
 
 	/**
-	 * Return code to start a method
+	 * Return method code
 	 *
-	 * @param string $name
-	 * @param array $parameters
-	 * @param string $return
-	 * @param int $visibility
-	 * @param boolean $static
-	 * @param array $throws
-	 * @param array $comments
-	 * @param int $tabs Number of tabs, null to use internal counter
-	 * @param int $endOfLines Number of end line character to add
+	 * @param Method $method
+	 * @param int $tabs
+	 * @param int $endOfLines
 	 * @return string
 	 */
-	public function getStartCode4Method($name, array $parameters = array(), $return = null, $visibility = self::VISIBILITY_PUBLIC, $static = false, array $throws = array(), array $comments = array(), $tabs = 1, $endOfLines = 1)
+	public function getCode4Method(Method $method, $tabs = 1, $endOfLines = 1)
 	{
-		$returnStr = null;
-		// if a phpdoc is required
-		if (count($parameters) > 0 || $return !== null || count($throws) > 0 || count($comments) > 0) {
-			$phpDoc = array();
-
-			// comments
-			if (count($comments) > 0) {
-				$phpDoc = array_merge($phpDoc, $comments);
-				$phpDoc[] = null;
-			}
-
-			// parameters
-			foreach ($parameters as $paramName => $infos) {
-				$paramStr = '@param ' . $infos['type'] . ' $' . $paramName;
-				if ($infos['comment'] != null) {
-					$paramStr .= ' ' . $infos['comment'];
-				}
-				$phpDoc[] = $paramStr;
-			}
-
-			// exceptions
-			foreach ($throws as $throw) {
-				$phpDoc[] = '@throws ' . $throw;
-			}
-
-			// return
-			if ($return !== null) {
-				$phpDoc[] = '@return ' . $return;
-			}
-
-			$returnStr .= $this->getCode4PHPDocComments($phpDoc, $tabs, 1);
-		}
+		$return = $this->getCode4PHPDocComments($method->getPHPDocParts(), $tabs, 1);
 
 		$declaration = null;
 
 		// visibility
-		$declaration .= $this->getCode4Visibility($visibility);
+		$declaration .= $this->getCode4Visibility($method->getVisibility());
 
 		// static
-		$declaration .= $this->getCode4Static($static);
+		$declaration .= $this->getCode4Static($method->isStatic());
 
-		$declaration .= 'function ' . $name . '(';
+		$declaration .= 'function ' . $method->getName() . '(';
 		// parameters
 		$paramsDeclaration = array();
-		foreach ($parameters as $paramName => $infos) {
+		foreach ($method->getParameters() as $parameter) {
 			$paramDeclaration = null;
-			if ($infos['forceType']) {
-				$paramDeclaration .= $infos['type'] . ' ';
+			if ($parameter->getForceType()) {
+				$paramDeclaration .= $parameter->getType() . ' ';
 			}
-			$paramDeclaration .= '$' . $paramName;
-			if ($infos['defaultValue'] !== null) {
-				$paramDeclaration .= ' = ' . $infos['defaultValue'];
+			$paramDeclaration .= '$' . $parameter->getName();
+			if ($parameter->getDefaultValue() !== null) {
+				$paramDeclaration .= ' = ' . $parameter->getDefaultValue();
 			}
 			$paramsDeclaration[] = $paramDeclaration;
 		}
 		$declaration .= implode(', ', $paramsDeclaration);
 		$declaration .= ')';
 
-		$returnStr .= $this->getCode4Line($declaration, $tabs, 1);
-		$returnStr .= $this->getCode4Line('{', $tabs, 1, $endOfLines);
+		$return .= $this->getCode4Line($declaration, $tabs, 1);
+		$return .= $this->getCode4Line('{', $tabs, 1, $endOfLines);
 
-		return $returnStr;
+		foreach ($method->getLines() as $line) {
+			$return .= $this->getCode4Line($line, 2);
+		}
+
+		$return .= $this->getcode4Line('}', 1);
+
+		return $return;
 	}
 
 	/**
