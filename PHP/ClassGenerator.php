@@ -586,7 +586,7 @@ class ClassGenerator extends Generator
 	public function write($fileName)
 	{
 		$code = $this->getCode();
-		$this->_createDir(dirname($fileName));
+		$this->createDir(dirname($fileName));
 		file_put_contents($fileName, $code);
 	}
 }

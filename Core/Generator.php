@@ -22,7 +22,7 @@ abstract class Generator
 	 *
 	 * @param string $dir
 	 */
-	protected function _createDir($dir)
+	protected function createDir($dir)
 	{
 		$dirName = $dir;
 		$reversedDirs = array($dir);
