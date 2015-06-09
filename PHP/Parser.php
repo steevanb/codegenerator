@@ -14,7 +14,7 @@ class Parser
 	 *
 	 * @return string
 	 */
-	protected function _getFullQyalifiedClassName()
+	protected function getFullQyalifiedClassName()
 	{
 		$token = $this->next();
 		$return = null;
@@ -46,12 +46,12 @@ class Parser
 		while ($token = $this->next()) {
 			// namespace
 			if ($token[0] == T_NAMESPACE) {
-				$return->setNamespace($this->_getFullQyalifiedClassName());
+				$return->setNamespace($this->getFullQyalifiedClassName());
 			}
 
 			// uses
 			if ($isInClass === false && $token[0] == T_USE) {
-				$return->addUse($this->_getFullQyalifiedClassName());
+				$return->addUse($this->getFullQyalifiedClassName());
 			}
 
 			// class name
