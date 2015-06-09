@@ -36,5 +36,4 @@ trait Name
 	{
 		return $this->name;
 	}
-
 }

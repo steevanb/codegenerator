@@ -42,5 +42,4 @@ class ClassProperty
 	{
 		$this->setName($name);
 	}
-
 }
