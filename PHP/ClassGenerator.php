@@ -343,7 +343,7 @@ class ClassGenerator extends Generator
 	 */
 	public function addInterface($interface)
 	{
-		if (in_array($interface, $this->interfaces) == false) {
+		if (in_array($interface, $this->interfaces) === false) {
 			$this->interfaces[] = $interface;
 		}
 
@@ -393,7 +393,7 @@ class ClassGenerator extends Generator
 	 */
 	public function addTrait($trait)
 	{
-		if (in_array($trait, $this->traits) == false) {
+		if (in_array($trait, $this->traits) === false) {
 			$this->traits[] = $trait;
 		}
 

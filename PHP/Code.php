@@ -30,7 +30,7 @@ trait Code
 	 */
 	public function getCode4Comments($comments, $tabs = 0, $endOfLines = 1)
 	{
-		if (is_array($comments) == false) {
+		if (is_array($comments) === false) {
 			$comments = array($comments);
 		}
 		$return = null;
@@ -53,7 +53,7 @@ trait Code
 	 */
 	public function getCode4PHPDocComments($comments, $tabs = 0, $endOfLines = 1)
 	{
-		if (is_array($comments) == false) {
+		if (is_array($comments) === false) {
 			$comments = array('comments' => $comments);
 		}
 		$return = null;
