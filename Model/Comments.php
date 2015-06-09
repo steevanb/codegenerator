@@ -23,6 +23,7 @@ trait Comments
 	public function setComments(array $comments)
 	{
 		$this->comments = $comments;
+
 		return $this;
 	}
 
@@ -35,6 +36,7 @@ trait Comments
 	public function addComment($comment)
 	{
 		$this->comments[] = $comment;
+
 		return $this;
 	}
 
@@ -56,6 +58,7 @@ trait Comments
 	public function clearComments()
 	{
 		$this->comments = array();
+
 		return $this;
 	}
 

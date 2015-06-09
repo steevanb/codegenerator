@@ -25,6 +25,7 @@ trait Visibility
 	public function setVisibility($visibility)
 	{
 		$this->visibility = $visibility;
+
 		return $this;
 	}
 

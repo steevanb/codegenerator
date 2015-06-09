@@ -7,7 +7,6 @@ namespace steevanb\CodeGenerator\PHP;
  */
 class PHPDoc
 {
-
 	/**
 	 * Parse a PHPDoc bloc
 	 *
@@ -89,13 +88,13 @@ class PHPDoc
 				break;
 			}
 
-			$posSpace = strpos($comment, ' ');
-			if ($posSpace === false) {
+			$posSeparator = strpos($comment, $separator);
+			if ($posSeparator === false) {
 				$return[$i] = $comment;
 				break;
 			} else {
-				$return[$i] = trim(substr($comment, 0, $posSpace));
-				$comment = substr($comment, $posSpace + 1);
+				$return[$i] = trim(substr($comment, 0, $posSeparator));
+				$comment = substr($comment, $posSeparator + 1);
 			}
 
 			$i++;
@@ -159,5 +158,4 @@ class PHPDoc
 
 		return $return;
 	}
-
 }

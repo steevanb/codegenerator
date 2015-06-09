@@ -23,6 +23,7 @@ trait DefaultValue
 	public function setDefaultValue($value)
 	{
 		$this->defaultValue = $value;
+
 		return $this;
 	}
 

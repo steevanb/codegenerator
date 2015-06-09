@@ -2,22 +2,17 @@
 
 namespace steevanb\CodeGenerator\PHP;
 
-use steevanb\CodeGenerator\Model\Comments;
-use steevanb\CodeGenerator\Model\IsStatic;
-use steevanb\CodeGenerator\Model\Name;
-use steevanb\CodeGenerator\Model\Visibility;
-use steevanb\CodeGenerator\Model\Type;
-use steevanb\CodeGenerator\Model\DefaultValue;
+use steevanb\CodeGenerator\Model;
 
 class ClassProperty
 {
 
-	use Name,
-	 Visibility,
-	 IsStatic,
-	 Comments,
-	 Type,
-	 DefaultValue;
+	use Model\Name;
+    use Model\Visibility;
+    use Model\IsStatic;
+    use Model\Comments;
+    use Model\Type;
+    use Model\DefaultValue;
 
 	/**
 	 * Get a property from a \RelfectionProperty object
@@ -34,6 +29,7 @@ class ClassProperty
 		if (array_key_exists('@var', $phpDoc)) {
 			$return->setType($phpDoc['@var'][0]['type']);
 		}
+
 		return $return;
 	}
 

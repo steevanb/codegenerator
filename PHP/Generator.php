@@ -9,6 +9,5 @@ use steevanb\CodeGenerator\Core\Generator as CoreGenerator;
  */
 class Generator extends CoreGenerator
 {
-
 	use Code;
 }

@@ -7,7 +7,6 @@ namespace steevanb\CodeGenerator\PHP;
  */
 trait Code
 {
-
 	/**
 	 * Return PHP code for a simple comment
 	 *
@@ -40,6 +39,7 @@ trait Code
 			$return .= $this->getCode4Line('// ' . $comment, $tabs, $eol);
 		}
 		$return .= $this->getEndOfLines($endOfLines);
+
 		return $return;
 	}
 
@@ -62,6 +62,7 @@ trait Code
 			$return .= $this->getCode4Line($phpDoc, $tabs);
 		}
 		$return .= $this->getEndOfLines($endOfLines - 1);
+
 		return $return;
 	}
 
@@ -311,5 +312,4 @@ trait Code
 
 		return $return;
 	}
-
 }

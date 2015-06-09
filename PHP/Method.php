@@ -2,44 +2,25 @@
 
 namespace steevanb\CodeGenerator\PHP;
 
-use steevanb\CodeGenerator\Model\Comments;
-use steevanb\CodeGenerator\Model\IsStatic;
-use steevanb\CodeGenerator\Model\Name;
-use steevanb\CodeGenerator\Model\Visibility;
+use steevanb\CodeGenerator\Model;
 
 class Method
 {
+	use Model\Comments;
+    use Model\IsStatic;
+	use Model\Name;
+    use Model\Visibility;
 
-	use Comments,
-	 IsStatic,
-	 Name,
-	 Visibility;
-	/**
-	 * Mrethod return type
-	 *
-	 * @var string
-	 */
+	/** @var string */
 	protected $return = null;
 
-	/**
-	 * Parameters
-	 *
-	 * @var MethodParameter[]
-	 */
+	/** @var MethodParameter[] */
 	protected $parameters = array();
 
-	/**
-	 * Exceptions throwned
-	 *
-	 * @var array
-	 */
+	/** @var array */
 	protected $exceptions = array();
 
-	/**
-	 * Code lines
-	 *
-	 * @var array
-	 */
+	/** @var array */
 	protected $lines = array();
 
 	/**
@@ -61,6 +42,7 @@ class Method
 	public function setReturn($return)
 	{
 		$this->return = $return;
+
 		return $this;
 	}
 
@@ -83,6 +65,7 @@ class Method
 	public function addParameter(MethodParameter $parameter)
 	{
 		$this->parameters[] = $parameter;
+
 		return $this;
 	}
 
@@ -95,6 +78,7 @@ class Method
 	public function setParameters(array $parameters)
 	{
 		$this->parameters = $parameters;
+
 		return $this;
 	}
 
@@ -118,6 +102,7 @@ class Method
 	public function addThrownedException($name, $comment)
 	{
 		$this->exceptions[$name] = $comment;
+
 		return $this;
 	}
 
@@ -186,6 +171,7 @@ class Method
 	public function addLine($line)
 	{
 		$this->lines[] = $line;
+
 		return $this;
 	}
 
@@ -198,5 +184,4 @@ class Method
 	{
 		return $this->lines;
 	}
-
 }

@@ -2,28 +2,20 @@
 
 namespace steevanb\CodeGenerator\PHP;
 
-use steevanb\CodeGenerator\Model\Comments;
-use steevanb\CodeGenerator\Model\DefaultValue;
-use steevanb\CodeGenerator\Model\Name;
-use steevanb\CodeGenerator\Model\Type;
-use steevanb\CodeGenerator\Model\Visibility;
+use steevanb\CodeGenerator\Model;
 
 /**
  * Method parameter definition
  */
 class MethodParameter
 {
+	use Model\Comments;
+    use Model\DefaultValue;
+    use Model\Name;
+    use Model\Type;
+    use Model\Visibility;
 
-	use Comments,
-	 DefaultValue,
-	 Name,
-	 Type,
-	 Visibility;
-	/**
-	 * Indicate if type will be forced in declaration
-	 *
-	 * @var boolean
-	 */
+	/** @var boolean */
 	protected $forceType = false;
 
 	/**
@@ -45,6 +37,7 @@ class MethodParameter
 	public function setForceType($force)
 	{
 		$this->forceType = $force;
+
 		return $this;
 	}
 
@@ -57,5 +50,4 @@ class MethodParameter
 	{
 		return $this->forceType;
 	}
-
 }

@@ -12,56 +12,35 @@ class ClassGenerator extends Generator
 {
 
 	use Code;
-	/**
-	 * @var string
-	 */
+
+	/** @var string */
 	protected $className;
 
-	/**
-	 * @var string
-	 */
+	/** @var string */
 	protected $namespace;
 
-	/**
-	 * @var string
-	 */
+	/** @var string */
 	protected $extends;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $interfaces = array();
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $traits = array();
 
-	/**
-	 * @var ClassProperty[]
-	 */
+	/** @var ClassProperty[] */
 	protected $properties = array();
 
-	/**
-	 * Current opened method
-	 *
-	 * @var pointer
-	 */
+	/** @var Method */
 	protected $currentMethod;
 
-	/**
-	 * @var Method[]
-	 */
+	/** @var Method[] */
 	protected $methods = array();
 
-	/**
-	 * @var boolean
-	 */
+	/** @var boolean */
 	protected $extractUses = true;
 
-	/**
-	 * @var array
-	 */
+	/** @var array */
 	protected $uses = array();
 
 	/**
@@ -104,6 +83,7 @@ class ClassGenerator extends Generator
 	public function setEndPHPTag($endPHPTag)
 	{
 		$this->endPHPTag = $endPHPTag;
+
 		return $this;
 	}
 
@@ -126,6 +106,7 @@ class ClassGenerator extends Generator
 	public function setConcatUses($concat)
 	{
 		$this->concatUses = $concat;
+
 		return $this;
 	}
 
@@ -148,6 +129,7 @@ class ClassGenerator extends Generator
 	public function setConcatTraits($concat)
 	{
 		$this->concatTraits = $concat;
+
 		return $this;
 	}
 
@@ -170,6 +152,7 @@ class ClassGenerator extends Generator
 	public function setExtractUses($extractUses)
 	{
 		$this->extractUses = $extractUses;
+
 		return $this;
 	}
 
@@ -191,6 +174,7 @@ class ClassGenerator extends Generator
 	public function setNamespace($name)
 	{
 		$this->namespace = $name;
+
 		return $this;
 	}
 
@@ -210,6 +194,7 @@ class ClassGenerator extends Generator
 	 * @param string $use Fully qualified class name, with namespace and class name (ex : Foo\Bar\Class)
 	 * @param string $className Final class name, null if you don't want to change it
 	 * @return string
+     * @throws ClassNameExists
 	 */
 	public function addUse($use, $className = null)
 	{
@@ -233,6 +218,7 @@ class ClassGenerator extends Generator
 			throw new ClassNameExists('Class "' . $class . '" already added, change his name via keyword "as".');
 		}
 		$this->uses[$use] = $class;
+
 		return $this->uses[$use];
 	}
 
@@ -248,6 +234,7 @@ class ClassGenerator extends Generator
 		foreach ($uses as $use) {
 			$this->addUse($use);
 		}
+
 		return $this;
 	}
 
@@ -259,6 +246,7 @@ class ClassGenerator extends Generator
 	public function clearUses()
 	{
 		$this->uses = array();
+
 		return $this;
 	}
 
@@ -281,6 +269,7 @@ class ClassGenerator extends Generator
 	public function setClassName($name)
 	{
 		$this->className = $name;
+
 		return $this;
 	}
 
@@ -306,6 +295,7 @@ class ClassGenerator extends Generator
 			$return .= $this->getNamespace() . '\\';
 		}
 		$return .= $this->getClassName();
+
 		return $return;
 	}
 
@@ -318,6 +308,7 @@ class ClassGenerator extends Generator
 	public function setExtends($extends)
 	{
 		$this->extends = $extends;
+
 		return $this;
 	}
 
@@ -340,6 +331,7 @@ class ClassGenerator extends Generator
 	public function setInterfaces($interfaces)
 	{
 		$this->interfaces = $interfaces;
+
 		return $this;
 	}
 
@@ -354,6 +346,7 @@ class ClassGenerator extends Generator
 		if (in_array($interface, $this->interfaces) == false) {
 			$this->interfaces[] = $interface;
 		}
+
 		return $this;
 	}
 
@@ -365,6 +358,7 @@ class ClassGenerator extends Generator
 	public function clearInterfaces()
 	{
 		$this->interfaces = array();
+
 		return $this;
 	}
 
@@ -387,6 +381,7 @@ class ClassGenerator extends Generator
 	public function setTraits(array $traits)
 	{
 		$this->traits = $traits;
+
 		return $this;
 	}
 
@@ -401,6 +396,7 @@ class ClassGenerator extends Generator
 		if (in_array($trait, $this->traits) == false) {
 			$this->traits[] = $trait;
 		}
+
 		return $this;
 	}
 
@@ -412,6 +408,7 @@ class ClassGenerator extends Generator
 	public function clearTraits()
 	{
 		$this->traits = array();
+
 		return $this;
 	}
 
@@ -434,6 +431,7 @@ class ClassGenerator extends Generator
 	public function addProperty(ClassProperty $property)
 	{
 		$this->properties[$property->getName()] = $property;
+
 		return $this;
 	}
 
@@ -445,6 +443,7 @@ class ClassGenerator extends Generator
 	public function clearProperties()
 	{
 		$this->properties = array();
+
 		return $this;
 	}
 
@@ -467,6 +466,7 @@ class ClassGenerator extends Generator
 	public function addMethod(Method $method)
 	{
 		$this->methods[] = $method;
+
 		return $this;
 	}
 
@@ -589,5 +589,4 @@ class ClassGenerator extends Generator
 		$this->_createDir(dirname($fileName));
 		file_put_contents($fileName, $code);
 	}
-
 }

@@ -48,6 +48,7 @@ abstract class Generator
 	public function setTabsAsSpaces($tabsAsSpaces)
 	{
 		$this->tabStr = ($tabsAsSpaces) ? '    ' : "\t";
+
 		return $this;
 	}
 
@@ -95,5 +96,4 @@ abstract class Generator
 	{
 		return $this->getTabs($tabs) . $line . $this->getEndOfLines($endOfLines);
 	}
-
 }

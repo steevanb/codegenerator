@@ -33,9 +33,9 @@ trait Manipulator
 	}
 
 	/**
-	 * Gets the next token.
-	 *
-	 * @param mixed A PHP token
+	 * Gets the next token
+     *
+     * @return mixed
 	 */
 	protected function next()
 	{
@@ -53,7 +53,8 @@ trait Manipulator
 	/**
 	 * Peeks the next token.
 	 *
-	 * @param mixed A PHP token
+	 * @param mixed $nb A PHP token
+     * @return mixed
 	 */
 	protected function peek($nb = 1)
 	{
@@ -80,5 +81,4 @@ trait Manipulator
 	{
 		return is_array($token) ? $token[1] : $token;
 	}
-
 }

@@ -20,9 +20,10 @@ trait IsStatic
 	 * @param boolean $isStatic
 	 * @return $this
 	 */
-	public function setIsStatic($isStatic)
+	public function setStatic($isStatic)
 	{
 		$this->isStatic = $isStatic;
+
 		return $this;
 	}
 

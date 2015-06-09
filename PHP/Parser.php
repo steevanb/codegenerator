@@ -7,7 +7,6 @@ namespace steevanb\CodeGenerator\PHP;
  */
 class Parser
 {
-
 	use Manipulator;
 
 	/**
@@ -26,6 +25,12 @@ class Parser
 		return $return;
 	}
 
+    /**
+     * @param string $fileName
+     * @return ClassGenerator
+     * @throws \Exception
+     * @throws \steevanb\CodeGenerator\Exception\ClassNameExists
+     */
 	public function getClassGeneratorFromFile($fileName)
 	{
 		if (is_readable($fileName) === false) {
@@ -68,9 +73,6 @@ class Parser
 			}
 		}
 
-		d($return->getcode());
-
 		return $return;
 	}
-
 }
