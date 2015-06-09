@@ -8,7 +8,7 @@ master
 1.2.0 (2014-07-15)
 ------------------
 
-- Create and use some traits
+- Refactoring, create and use some traits
 - Add ClassGenerator::setEndPHPTag() and getEndPHPTag()
 - Add ClassGenerator::setConcatUses() and getConcatUses()
 - Add ClassGenerator::setConcatTraits() and getConcatTraits()
@@ -27,3 +27,5 @@ master
 ------------------
 
 - Creating repository
+
+[Back to index](../README.md)
