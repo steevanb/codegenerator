@@ -1,24 +1,18 @@
 <?php
 
-namespace steevanb\CodeGenerator\Model;
+namespace steevanb\CodeGenerator\Behavior;
 
-use steevanb\CodeGenerator\Core\Generator;
+use steevanb\CodeGenerator\AbstractGenerator;
 
 /**
  * Add visibility property and accessors
  */
-trait Visibility
+trait VisibilityTrait
 {
-	/**
-	 * Visibility
-	 *
-	 * @var int
-	 */
-	protected $visibility = Generator::VISIBILITY_PUBLIC;
+	/** @var int */
+	protected $visibility = AbstractGenerator::VISIBILITY_PUBLIC;
 
 	/**
-	 * Set visibility
-	 *
 	 * @param int $visibility
 	 * @return $this
 	 */
@@ -30,8 +24,6 @@ trait Visibility
 	}
 
 	/**
-	 * Get visibility
-	 *
 	 * @return int
 	 */
 	public function getVisibility()

@@ -1,22 +1,16 @@
 <?php
 
-namespace steevanb\CodeGenerator\Model;
+namespace steevanb\CodeGenerator\Behavior;
 
 /**
  * Add type property and accessors
  */
-trait Type
+trait TypeTrait
 {
-	/**
-	 * Type
-	 *
-	 * @var string
-	 */
+	/** @var string */
 	protected $type = null;
 
 	/**
-	 * Set type
-	 *
 	 * @param string $type
 	 * @return $this
 	 */
@@ -28,8 +22,6 @@ trait Type
 	}
 
 	/**
-	 * Get type
-	 *
 	 * @return string
 	 */
 	public function getType()

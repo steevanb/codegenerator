@@ -1,26 +1,21 @@
 <?php
 
-namespace steevanb\CodeGenerator\PHP;
+namespace steevanb\CodeGenerator\Php\ClassGenerator;
 
-use steevanb\CodeGenerator\Model;
+use steevanb\CodeGenerator\Behavior;
 
-/**
- * Method parameter definition
- */
 class MethodParameter
 {
-	use Model\Comments;
-    use Model\DefaultValue;
-    use Model\Name;
-    use Model\Type;
-    use Model\Visibility;
+	use Behavior\CommentsTrait;
+    use Behavior\DefaultValueTrait;
+    use Behavior\NameTrait;
+    use Behavior\TypeTrait;
+    use Behavior\VisibilityTrait;
 
 	/** @var boolean */
 	protected $forceType = false;
 
 	/**
-	 * Cosntructor
-	 *
 	 * @param string $name
 	 */
 	public function __construct($name = null)
@@ -29,8 +24,6 @@ class MethodParameter
 	}
 
 	/**
-	 * Define if type will be forced in declaration
-	 *
 	 * @param boolean $force
 	 * @return $this
 	 */
@@ -42,8 +35,6 @@ class MethodParameter
 	}
 
 	/**
-	 * Return if type will be forced in declaration
-	 *
 	 * @return boolean
 	 */
 	public function getForceType()

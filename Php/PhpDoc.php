@@ -1,23 +1,16 @@
 <?php
 
-namespace steevanb\CodeGenerator\PHP;
+namespace steevanb\CodeGenerator\Php;
 
-/**
- * Tools for PHPDoc
- */
-class PHPDoc
+class PhpDoc
 {
 	/**
-	 * Parse a PHPDoc bloc
-	 *
 	 * @param string $phpDoc
 	 * @return array
 	 */
 	public static function parse($phpDoc)
 	{
-		$return = array(
-			'comments' => array()
-		);
+		$return = [];
 		if (is_string($phpDoc) === false) {
 			return $return;
 		}
@@ -35,7 +28,10 @@ class PHPDoc
 			$line = trim(substr($line, 1));
 
 			// comment
-			if (substr($line, 0, 1) != '@') {
+			if (substr($line, 0, 1) !== '@') {
+                if (isset($return['comments']) === false) {
+                    $return['comments'] = [];
+                }
 				$return['comments'][] = $line;
 			} else {
 				$keyword = (strpos($line, ' ') === false) ? $line : substr($line, 0, strpos($line, ' '));
@@ -45,10 +41,10 @@ class PHPDoc
 				switch ($keyword) {
 					case '@var' :
 						$parts = self::explodeParts($comment, 2);
-						$commentParts = array(
+						$commentParts = [
 							'type' => $parts[0],
 							'comment' => $parts[1]
-						);
+						];
 						break;
 					default:
 						$commentParts = array('comment' => $comment);
@@ -56,7 +52,7 @@ class PHPDoc
 				}
 
 				if (array_key_exists($keyword, $return) === false) {
-					$return[$keyword] = array();
+					$return[$keyword] = [];
 				}
 				$return[$keyword][] = $commentParts;
 			}
@@ -66,8 +62,6 @@ class PHPDoc
 	}
 
 	/**
-	 * Explode phpdoc line parts
-	 *
 	 * @param string $comment Comment line, without keyword
 	 * @param int $count Number of parts you want
 	 * @param string $separator
@@ -82,7 +76,6 @@ class PHPDoc
 
 		$i = 0;
 		while (strlen($comment) > 0) {
-			// last item
 			if ($i == count($return) - 1) {
 				$return[$i] = $comment;
 				break;
@@ -109,11 +102,10 @@ class PHPDoc
 	 * @param array $phpDoc
 	 * @return array
 	 */
-	public static function generate(array $phpDoc)
+	public static function asString(array $phpDoc)
 	{
 		$start = ' * ';
 
-		// comment
 		$comments = array();
 		if (array_key_exists('comments', $phpDoc)) {
 			foreach ($phpDoc['comments'] as $line) {
@@ -122,7 +114,6 @@ class PHPDoc
 			unset($phpDoc['comments']);
 		}
 
-		// keywords
 		$keywords = array();
 		foreach ($phpDoc as $keyword => $doc) {
 			switch ($keyword) {
@@ -140,13 +131,11 @@ class PHPDoc
 			}
 		}
 
-		// no phpdoc to generate
 		if (count($comments) == 0 && count($keywords) == 0) {
-			return array();
+			return [];
 		}
 
-		// generate full phpdoc
-		$return = array('/**');
+		$return = ['/**'];
 		if (count($comments) > 0) {
 			$return = array_merge($return, $comments);
 			if (count($keywords) > 0) {

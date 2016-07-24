@@ -2,7 +2,7 @@
 
 namespace steevanb\CodeGenerator\Exception;
 
-class ClassNameExists extends \Exception
+class ClassNameExistsException extends \Exception
 {
 
 }

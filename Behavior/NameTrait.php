@@ -1,22 +1,13 @@
 <?php
 
-namespace steevanb\CodeGenerator\Model;
+namespace steevanb\CodeGenerator\Behavior;
 
-/**
- * Add name property and accessors
- */
-trait Name
+trait NameTrait
 {
-	/**
-	 * Name
-	 *
-	 * @var string
-	 */
+	/** @var string */
 	protected $name;
 
 	/**
-	 * Set name
-	 *
 	 * @param string $name
 	 * @return $this
 	 */
@@ -28,8 +19,6 @@ trait Name
 	}
 
 	/**
-	 * Get name
-	 *
 	 * @return string
 	 */
 	public function getName()

@@ -1,22 +1,13 @@
 <?php
 
-namespace steevanb\CodeGenerator\Model;
+namespace steevanb\CodeGenerator\Behavior;
 
-/**
- * Add comments property and accessors
- */
-trait Comments
+trait CommentsTrait
 {
-	/**
-	 * Comments
-	 *
-	 * @var array
-	 */
+	/** @var array */
 	protected $comments = array();
 
 	/**
-	 * Define all comments
-	 *
 	 * @param array $comments
 	 * @return $this
 	 */
@@ -28,8 +19,6 @@ trait Comments
 	}
 
 	/**
-	 * Add comment
-	 *
 	 * @param string $comment
 	 * @return $this
 	 */
@@ -41,8 +30,6 @@ trait Comments
 	}
 
 	/**
-	 * Get comments
-	 *
 	 * @return array
 	 */
 	public function getComments()
@@ -51,8 +38,6 @@ trait Comments
 	}
 
 	/**
-	 * Clear comments
-	 *
 	 * @return $this
 	 */
 	public function clearComments()
@@ -61,5 +46,4 @@ trait Comments
 
 		return $this;
 	}
-
 }

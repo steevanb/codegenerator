@@ -1,17 +1,14 @@
 <?php
 
-namespace steevanb\CodeGenerator\PHP;
+namespace steevanb\CodeGenerator\Php\ClassGenerator;
 
-use steevanb\CodeGenerator\Core\Generator;
-use steevanb\CodeGenerator\Exception\ClassNameExists;
+use steevanb\CodeGenerator\AbstractGenerator;
+use steevanb\CodeGenerator\Exception\ClassNameExistsException;
+use steevanb\CodeGenerator\Php\Behavior\CodeTrait;
 
-/**
- * PHP class generator
- */
-class ClassGenerator extends Generator
+class ClassGenerator extends AbstractGenerator
 {
-
-	use Code;
+	use CodeTrait;
 
 	/** @var string */
 	protected $className;
@@ -28,7 +25,7 @@ class ClassGenerator extends Generator
 	/** @var array */
 	protected $traits = array();
 
-	/** @var ClassProperty[] */
+	/** @var Property[] */
 	protected $properties = array();
 
 	/** @var Method */
@@ -43,31 +40,17 @@ class ClassGenerator extends Generator
 	/** @var array */
 	protected $uses = array();
 
-	/**
-	 * Indicate if we need to close PHP tag
-	 *
-	 * @var type
-	 */
-	protected $endPHPTag = false;
+	/** @var bool */
+	protected $endPhpTag = false;
 
-	/**
-	 * Indicate if uses will be concatened (use Foo, Bar;) or if we will have one line per uses (use Foo; use Bar;)
-	 *
-	 * @var boolean
-	 */
+	/** @var boolean */
 	protected $concatUses = false;
 
-	/**
-	 * Indicate if traits will be concatened (use Foo, Bar;) or if we will have one line per uses (use Foo; use Bar;)
-	 *
-	 * @var boolean
-	 */
+	/** @var boolean */
 	protected $concatTraits = false;
 
 	/**
-	 * Constructor
-	 *
-	 * @param string $name
+	 * @param string|null $name
 	 */
 	public function __construct($name = null)
 	{
@@ -75,14 +58,12 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Define if we need to close PHP tag
-	 *
-	 * @param boolean $endPHPTag
+	 * @param bool $endPhpTag
 	 * @return $this
 	 */
-	public function setEndPHPTag($endPHPTag)
+	public function setEndPhpTag($endPhpTag)
 	{
-		$this->endPHPTag = $endPHPTag;
+		$this->endPhpTag = $endPhpTag;
 
 		return $this;
 	}
@@ -92,15 +73,13 @@ class ClassGenerator extends Generator
 	 *
 	 * @return boolean
 	 */
-	public function getEndPHPTag()
+	public function getEndPhpTag()
 	{
-		return $this->endPHPTag;
+		return $this->endPhpTag;
 	}
 
 	/**
-	 * Define if uses will be concatened (use Foo, Bar;) or if we will have one line per uses (use Foo; use Bar;)
-	 *
-	 * @param boolean $concat
+	 * @param bool $concat
 	 * @return $this
 	 */
 	public function setConcatUses($concat)
@@ -111,9 +90,7 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Indicate if uses will be concatened (use Foo, Bar;) or if we will have one line per uses (use Foo; use Bar;)
-	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function getConcatUses()
 	{
@@ -121,9 +98,7 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Define if traits will be concatened (use Foo, Bar;) or if we will have one line per uses (use Foo; use Bar;)
-	 *
-	 * @param boolean $concat
+	 * @param bool $concat
 	 * @return $this
 	 */
 	public function setConcatTraits($concat)
@@ -134,9 +109,7 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Indicate if traits will be concatened (use Foo, Bar;) or if we will have one line per uses (use Foo; use Bar;)
-	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function getConcatTraits()
 	{
@@ -144,9 +117,7 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Define if we need to extract all classes and add it as use
-	 *
-	 * @param boolean $extractUses
+	 * @param bool $extractUses
 	 * @return $this
 	 */
 	public function setExtractUses($extractUses)
@@ -157,8 +128,7 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Get if we need to extract all classes and add it as use
-	 * @return boolean
+	 * @return bool
 	 */
 	public function getExtractUses()
 	{
@@ -166,21 +136,17 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Define namespace
-	 *
-	 * @param string $name
+	 * @param string $namespace
 	 * @return $this
 	 */
-	public function setNamespace($name)
+	public function setNamespace($namespace)
 	{
-		$this->namespace = $name;
+		$this->namespace = $namespace;
 
 		return $this;
 	}
 
 	/**
-	 * Get namespace
-	 *
 	 * @return string
 	 */
 	public function getNamespace()
@@ -189,42 +155,38 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Add a class to use
-	 *
-	 * @param string $use Fully qualified class name, with namespace and class name (ex : Foo\Bar\Class)
-	 * @param string $className Final class name, null if you don't want to change it
+	 * @param string $fullyQualifiedClassName
+	 * @param string $className
 	 * @return string
-     * @throws ClassNameExists
+     * @throws ClassNameExistsException
 	 */
-	public function addUse($use, $className = null)
+	public function addUse($fullyQualifiedClassName, $className = null)
 	{
 		// already added
-		if (array_key_exists($use, $this->uses)) {
-			return $this->uses[$use];
+		if (array_key_exists($fullyQualifiedClassName, $this->uses)) {
+			return $this->uses[$fullyQualifiedClassName];
 		}
 
 		// new className
 		if ($className === null) {
-			$posBackSlash = strrpos($use, '\\');
+			$posBackSlash = strrpos($fullyQualifiedClassName, '\\');
 			if ($posBackSlash !== false) {
-				$class = substr($use, $posBackSlash + 1);
+				$class = substr($fullyQualifiedClassName, $posBackSlash + 1);
 			} else {
-				$class = $use;
+				$class = $fullyQualifiedClassName;
 			}
 		} else {
 			$class = $className;
 		}
 		if (in_array($class, $this->uses)) {
-			throw new ClassNameExists('Class "' . $class . '" already added, change his name via keyword "as".');
+			throw new ClassNameExistsException('Class "' . $class . '" already added, change his name via keyword "as".');
 		}
-		$this->uses[$use] = $class;
+		$this->uses[$fullyQualifiedClassName] = $class;
 
-		return $this->uses[$use];
+		return $this->uses[$fullyQualifiedClassName];
 	}
 
 	/**
-	 * Define all classes to use
-	 *
 	 * @param array $uses
 	 * @return $this
 	 */
@@ -239,8 +201,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Clear all uses
-	 *
 	 * @return $this
 	 */
 	public function clearUses()
@@ -251,8 +211,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Get uses
-	 *
 	 * @return array
 	 */
 	public function getUses()
@@ -261,8 +219,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Define class name
-	 *
 	 * @param string $name
 	 * @return $this
 	 */
@@ -274,8 +230,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Get class name
-	 *
 	 * @return string
 	 */
 	public function getClassName()
@@ -284,8 +238,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Return fully qualified class name
-	 *
 	 * @return string
 	 */
 	public function getFullyQualifiedClassName()
@@ -300,8 +252,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Define extended class
-	 *
 	 * @param string $extends
 	 * @return $this
 	 */
@@ -313,8 +263,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Get extended class
-	 *
 	 * @return string
 	 */
 	public function getExtends()
@@ -323,12 +271,10 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Define interfaces
-	 *
 	 * @param array $interfaces
 	 * @return $this
 	 */
-	public function setInterfaces($interfaces)
+	public function setInterfaces(array $interfaces)
 	{
 		$this->interfaces = $interfaces;
 
@@ -336,8 +282,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Add interface used by the class
-	 *
 	 * @param string $interface
 	 * @return $this
 	 */
@@ -351,8 +295,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Clear all interfaces
-	 *
 	 * @return $this
 	 */
 	public function clearInterfaces()
@@ -363,8 +305,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Get interfaces
-	 *
 	 * @return array
 	 */
 	public function getInterfaces()
@@ -373,8 +313,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Define traits
-	 *
 	 * @param array $traits
 	 * @return $this
 	 */
@@ -386,8 +324,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Add a trait
-	 *
 	 * @param string $trait
 	 * @return $this
 	 */
@@ -401,8 +337,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Clear all traits
-	 *
 	 * @return $this
 	 */
 	public function clearTraits()
@@ -413,8 +347,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Get traits
-	 *
 	 * @return array
 	 */
 	public function getTraits()
@@ -423,12 +355,10 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Add a property
-	 *
-	 * @param ClassProperty $property
+	 * @param Property $property
 	 * @return $this
 	 */
-	public function addProperty(ClassProperty $property)
+	public function addProperty(Property $property)
 	{
 		$this->properties[$property->getName()] = $property;
 
@@ -436,8 +366,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Clear all properties
-	 *
 	 * @return $this
 	 */
 	public function clearProperties()
@@ -448,9 +376,7 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Get properties
-	 *
-	 * @return array
+	 * @return Property[]
 	 */
 	public function getProperties()
 	{
@@ -458,8 +384,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Add a method
-	 *
 	 * @param Method $method
 	 * @return $this
 	 */
@@ -471,9 +395,7 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Get methods
-	 *
-	 * @return array
+	 * @return Method[]
 	 */
 	public function getMethods()
 	{
@@ -481,8 +403,6 @@ class ClassGenerator extends Generator
 	}
 
 	/**
-	 * Return PHP generated code
-	 *
 	 * @return string
 	 */
 	public function getCode()
@@ -490,11 +410,11 @@ class ClassGenerator extends Generator
 		$countProperties = count($this->getProperties());
 		$countMethods = count($this->getMethods());
 
-		$return = $this->getCode4Line('<?php', 0, 2);
+		$return = $this->getCodeForLine('<?php', 0, 2);
 
 		// namespace
 		if ($this->getNamespace() != null) {
-			$return .= $this->getCode4Namespace($this->getNamespace(), 0, 2);
+			$return .= $this->getCodeForNamespace($this->getNamespace(), 0, 2);
 		}
 
 		// extract uses
@@ -508,14 +428,14 @@ class ClassGenerator extends Generator
 			// interfaces
 			foreach ($this->interfaces as $interface) {
 				if (strpos($interface, '\\') !== false) {
-					$interface = $this->addUse($interface);
+					$this->addUse($interface);
 				}
 			}
 
 			// traits
 			foreach ($this->traits as $trait) {
 				if (strpos($trait, '\\') !== false) {
-					$trait = $this->addUse($trait);
+					$this->addUse($trait);
 				}
 			}
 
@@ -542,51 +462,56 @@ class ClassGenerator extends Generator
 			}
 		}
 
-
 		// uses
-		$return .= $this->getCode4Uses($this->getUses(), $this->getConcatUses(), 0, 2);
+		$return .= $this->getCodeForUses($this->getUses(), $this->getConcatUses(), 0, 2);
 
 		// class declaration
-		$return .= $this->getStartCode4Class($this->getClassName(), $this->getExtends(), $this->getInterfaces(), $this->getTraits());
+		$return .= $this->getCodeForStartClass(
+            $this->getClassName(),
+            $this->getExtends(),
+            $this->getInterfaces(),
+            $this->getTraits()
+        );
 
 		// properties
 		$indexProperties = 0;
 		foreach ($this->getProperties() as $property) {
-			$return .= $this->getCode4Property($property);
+			$return .= $this->getCodeForProperty($property);
 			if ($indexProperties < $countProperties - 1) {
-				$return .= $this->getEndOfLines();
+				$return .= $this->getCodeForEndOfLines();
 			}
 
 			$indexProperties++;
 		}
 		if ($countProperties > 0 && $countMethods > 0) {
-			$return .= $this->getEndOfLines();
+			$return .= $this->getCodeForEndOfLines();
 		}
 
 		// methods
 		$indexMethods = 0;
 		foreach ($this->getMethods() as $method) {
-			$return .= $this->getCode4Method($method);
+			$return .= $this->getCodeForMethod($method);
 			if ($indexMethods < $countMethods - 1) {
-				$return .= $this->getEndOfLines();
+				$return .= $this->getCodeForEndOfLines();
 			}
 			$indexMethods++;
 		}
 
-		$return .= $this->getEndCode4Class();
+		$return .= $this->getCodeForEndClass();
 
 		return $return;
 	}
 
 	/**
-	 * Write PHP code to file
-	 *
 	 * @param string $fileName
+     * @return $this
 	 */
 	public function write($fileName)
 	{
 		$code = $this->getCode();
 		$this->createDir(dirname($fileName));
 		file_put_contents($fileName, $code);
+
+        return $this;
 	}
 }

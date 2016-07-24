@@ -8,17 +8,17 @@
  * file that was distributed with this source code.
  */
 
-namespace steevanb\CodeGenerator\PHP;
+namespace steevanb\CodeGenerator\Php\Behavior;
 
 /**
  * Changes the PHP code of a Kernel.
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-trait Manipulator
+trait ManipulatorTrait
 {
-	protected $tokens;
-	protected $line;
+	protected static $tokens;
+	protected static $line;
 
 	/**
 	 * Sets the code to manipulate.
@@ -26,10 +26,10 @@ trait Manipulator
 	 * @param array   $tokens An array of PHP tokens
 	 * @param integer $line   The start line of the code
 	 */
-	protected function setCode(array $tokens, $line = 0)
+	protected static function setCode(array $tokens, $line = 0)
 	{
-		$this->tokens = $tokens;
-		$this->line = $line;
+		self::$tokens = $tokens;
+		self::$line = $line;
 	}
 
 	/**
@@ -37,10 +37,10 @@ trait Manipulator
      *
      * @return mixed
 	 */
-	protected function next()
+	protected static function next()
 	{
-		while ($token = array_shift($this->tokens)) {
-			$this->line += substr_count($this->value($token), "\n");
+		while ($token = array_shift(static::$tokens)) {
+			static::$line += substr_count(static::value($token), "\n");
 
 			if (is_array($token) && in_array($token[0], array(T_WHITESPACE, T_COMMENT, T_DOC_COMMENT))) {
 				continue;
@@ -56,10 +56,10 @@ trait Manipulator
 	 * @param mixed $nb A PHP token
      * @return mixed
 	 */
-	protected function peek($nb = 1)
+	protected static function peek($nb = 1)
 	{
 		$i = 0;
-		$tokens = $this->tokens;
+		$tokens = static::$tokens;
 		while ($token = array_shift($tokens)) {
 			if (is_array($token) && in_array($token[0], array(T_WHITESPACE, T_COMMENT, T_DOC_COMMENT))) {
 				continue;
@@ -77,7 +77,7 @@ trait Manipulator
 	 *
 	 * @param string The token value
 	 */
-	protected function value($token)
+	protected static function value($token)
 	{
 		return is_array($token) ? $token[1] : $token;
 	}

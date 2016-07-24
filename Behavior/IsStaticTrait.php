@@ -1,22 +1,13 @@
 <?php
 
-namespace steevanb\CodeGenerator\Model;
+namespace steevanb\CodeGenerator\Behavior;
 
-/**
- * Add isStatic property and accessors
- */
-trait IsStatic
+trait IsStaticTrait
 {
-	/**
-	 * Indicate if it's static
-	 *
-	 * @var boolean
-	 */
+	/** @var boolean */
 	protected $isStatic = false;
 
 	/**
-	 * Set if it's static
-	 *
 	 * @param boolean $isStatic
 	 * @return $this
 	 */
@@ -28,8 +19,6 @@ trait IsStatic
 	}
 
 	/**
-	 * Get if it's static
-	 *
 	 * @return boolean
 	 */
 	public function isStatic()
